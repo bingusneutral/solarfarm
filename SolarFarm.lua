@@ -238,31 +238,41 @@ ASAButton.Activated:Connect(function()
 end)
 
 while task.wait() do
-    if AutoStealAll then
-        local Plots = game:GetService("Workspace").Plots:GetDescendants()
-    
-        for _, PBattery in Plots do
-            if PBattery and PBattery.Name:sub(-7) == "Battery" and PBattery:IsA("Model") and AutoStealAll then
-                if PBattery.Parent:GetAttribute("OwnerUsername") then
-                    if PBattery.Parent:GetAttribute("OwnerUsername") == Player.Name then continue end
+    if not AutoStealAll then
+        continue
+    end
 
-                    local Hitbox = PBattery:FindFirstChild("Hitbox")
-                    if not Hitbox then continue end
+    local PlotFolders = game:GetService("Workspace").Plots:GetChildren()
 
-                    local Prompt = Hitbox:FindFirstChild("ProximityPrompt")
-                    if not Prompt or not Prompt.Enabled then continue end
+    for _, Plot in ipairs(PlotFolders) do
+        for _, PBattery in ipairs(Plot:GetChildren()) do
 
-                    print("Found battery to steal: " .. PBattery.Name)
-                    StealBattery(PBattery, Hitbox, Prompt)
-                    print("Trying to steal battery...")
-                    task.wait(0.6)
-                else
-                    Plots = game:GetService("Workspace").Plots:GetDescendants()
+            if PBattery
+            and PBattery:IsA("Model")
+            and PBattery.Name:sub(-7) == "Battery" then
+
+                local Owner = Plot:GetAttribute("OwnerUsername")
+                if not Owner or Owner == Player.Name then
+                    continue
                 end
+
+                local Hitbox = PBattery:FindFirstChild("Hitbox")
+                if not Hitbox then
+                    continue
+                end
+
+                local Prompt = Hitbox:FindFirstChild("ProximityPrompt")
+                if not Prompt or not Prompt.Enabled then
+                    continue
+                end
+
+                print("Found battery to steal: " .. PBattery.Name)
+                StealBattery(PBattery, Hitbox, Prompt)
+                print("Trying to steal battery...")
+                task.wait(0.6)
             end
+
             task.wait()
         end
-    else
-        continue
     end
 end
